@@ -1,8 +1,8 @@
 import { Inject, OnModuleInit, OnModuleDestroy, Logger, Controller, Get, Post, Body, Req, Put, Delete, Query, UseGuards, Param, CacheInterceptor, UseInterceptors } from '@nestjs/common';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { RolesGuard } from '../auth/guards/roles.guard';
-import { PermissionsGuard } from '../auth/guards/permissions.guard';
-import { Permissions } from '../auth/decorator/permissions.decorator';
+import { JwtAuthGuard } from '../guards/jwt-auth.guard';
+import { RolesGuard } from '../guards/roles.guard';
+import { PermissionsGuard } from '../guards/permissions.guard';
+import { Permissions } from '../decorator/permissions.decorator';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -11,7 +11,7 @@ import {
   ApiParam,
   ApiQuery
 } from '@nestjs/swagger';
-import { User } from './user.entity';
+import { User } from '../entity/user.entity';
 
 @ApiBearerAuth()
 @ApiTags('user')
@@ -19,26 +19,26 @@ import { User } from './user.entity';
 @UseInterceptors(CacheInterceptor)
 
 export class UserController {
-    constructor(
+   constructor(
       
-    ) {}
+   ) {}
 
-    logger = new Logger('Main');
+   logger = new Logger('Main');
 
-    @Get('/')
-    @ApiOperation({ summary: 'Get users' })
-    @ApiQuery({
+   @Get('/')
+   @ApiOperation({ summary: 'Get users' })
+   @ApiQuery({
       name: 'username',
       required: false
     })
-    @ApiResponse({
+   @ApiResponse({
       status: 200,
       description: 'The found record',
       type: User,
-    })
-    @UseGuards(JwtAuthGuard, PermissionsGuard)
-    @Permissions('get:user')
-    async get(@Query() param) {
+   })
+   @UseGuards(JwtAuthGuard, PermissionsGuard)
+   @Permissions('get:user')
+   async get(@Query() param) {
         this.logger.log('Get all users');
         const pattern = 'users.get';
         //return await this.client.send(pattern, param);

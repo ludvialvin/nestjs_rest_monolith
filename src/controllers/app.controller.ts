@@ -1,5 +1,5 @@
 import { Controller, Get, HttpStatus, UseGuards } from '@nestjs/common';
-import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
+import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 
 @Controller()
 export class AppController {
@@ -10,7 +10,7 @@ export class AppController {
   getRoot() {
     return {
       statusCode: HttpStatus.OK,
-      message: 'Nest JS Kafka Microservice',
+      message: 'Nest JS Monolith',
     }
   }
 }
