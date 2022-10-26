@@ -1,10 +1,9 @@
-import { Controller, Body, Post, Request, UseGuards, Get } from '@nestjs/common';
+import { Controller, Body, Post, Request, UseGuards } from '@nestjs/common';
 import { LocalAuthGuard } from '../guards/local-auth.guard';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { GetUser } from '../decorator/request';
 import { AuthService } from '../services/auth.service';
 import { AuthCredentials } from '../dto/auth.dto';
-//import { AuthResponse } from '../interfaces/auth.interface';
 import {
 	ApiBearerAuth,
 	ApiOperation,
@@ -22,8 +21,9 @@ export class AuthController {
   
 	@Post('/login')
 	@UseGuards(LocalAuthGuard)
-	async login(@Body() body) {
-		return this.authService.login(body);
+	async login(@Request() request) {
+		request.session.permissions = request.session.permissions ? request.session.permissions : request.user.permissions;
+      return await this.authService.login(request.user);
 	}
 
 	@Post('/register')
@@ -34,7 +34,6 @@ export class AuthController {
 
 	@Post('/refresh')
 	async refreshToken(@Body() params) {
-		console.log(params)
 		return await this.authService.refreshToken(params);
 	}
 

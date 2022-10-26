@@ -1,6 +1,5 @@
-import { Inject, OnModuleInit, OnModuleDestroy, Logger, Controller, Get, Post, Body, Req, Put, Delete, Query, UseGuards, Param, CacheInterceptor, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Delete, Query, UseGuards, Param, CacheInterceptor, UseInterceptors, HttpException } from '@nestjs/common';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
-import { RolesGuard } from '../guards/roles.guard';
 import { PermissionsGuard } from '../guards/permissions.guard';
 import { Permissions } from '../decorator/permissions.decorator';
 import {
@@ -12,18 +11,19 @@ import {
   ApiQuery
 } from '@nestjs/swagger';
 import { User } from '../entity/user.entity';
+import { UsersService } from '../services/users.service';
+import { CreateUserDto } from '../dto/create-user.dto';
+import { UpdateUserDto } from '../dto/update-user.dto';
 
 @ApiBearerAuth()
 @ApiTags('user')
 @Controller('user')
 @UseInterceptors(CacheInterceptor)
 
-export class UserController {
+export class UsersController {
    constructor(
-      
+      private readonly usersService: UsersService
    ) {}
-
-   logger = new Logger('Main');
 
    @Get('/')
    @ApiOperation({ summary: 'Get users' })
@@ -37,53 +37,41 @@ export class UserController {
       type: User,
    })
    @UseGuards(JwtAuthGuard, PermissionsGuard)
-   @Permissions('get:user')
+   @Permissions('user:get')
    async get(@Query() param) {
-        this.logger.log('Get all users');
-        const pattern = 'users.get';
-        //return await this.client.send(pattern, param);
-
-        return {}
-    }
+      const result = await this.usersService.findAll();
+      throw new HttpException(result, result.statusCode);
+   }
 
     @Get(":id")
     @UseGuards(JwtAuthGuard, PermissionsGuard)
-    @Permissions('getOne:user')
-    //async getUserById(@Req() body:Body) {
-    async getOne(@Param() param) {
-        this.logger.log('Get user by id');
-        const pattern = 'users.getById';
-        //return await this.client.send(pattern, param);
-        return {}
+    @Permissions('user:get')
+    async getOne(@Param('id') id: string) {
+      const result = await this.usersService.findOne(+id);
+      throw new HttpException(result, result.statusCode);
     }
 
     @Post('/')
     @UseGuards(JwtAuthGuard, PermissionsGuard)
-    @Permissions('create:user')
-    async create(@Body() param) {
-        this.logger.log('Create user');
-        const pattern = 'users.insert';
-        //return await this.client.send(pattern, param);
-        return {}
+    @Permissions('user:get')
+    async create(@Body() createUserDto: CreateUserDto) {
+      const result = await this.usersService.create(createUserDto);
+      throw new HttpException(result, result.statusCode);
     }
 
     @Put(':id')
     @UseGuards(JwtAuthGuard, PermissionsGuard)
-    @Permissions('update:user')
-    async update(@Body() param) {
-        this.logger.log('Update user');
-        const pattern = 'users.update';
-        //return await this.client.send(pattern, param);
-        return {}
+    @Permissions('user:update')
+    async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+      const result = await this.usersService.update(+id, updateUserDto);
+      throw new HttpException(result, result.statusCode);
     }
 
     @Delete(":id")
     @UseGuards(JwtAuthGuard, PermissionsGuard)
-    @Permissions('delete:user')
-    async delete(@Param() param) {
-        this.logger.log('Delete user');
-        const pattern = 'users.delete';
-        //return await this.client.send(pattern, param);
-        return {}
+    @Permissions('user:delete')
+    async delete(@Param('id') id: string) {
+      const result = await this.usersService.remove(+id);
+      throw new HttpException(result, result.statusCode);
     }
 }

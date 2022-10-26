@@ -1,32 +1,35 @@
 import { Module, CacheModule, NestModule, MiddlewareConsumer, RequestMethod } from '@nestjs/common';
-import { jwtConstants } from '../strategy/constants';
 import { JwtStrategy } from '../strategy/jwt.strategy';
-import { JwtModule } from '@nestjs/jwt';
-import { PassportModule } from '@nestjs/passport';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from '../controllers/app.controller';
-import { AuthModule } from '../modules/auth.module';
 import { LoggerMiddleware } from '../middleware/logger.middleware';
-/*import { UserModule } from './user/user.module';
-import { ArticleModule } from './article/article.module';*/
+import { SqliteConnectionOptions } from 'typeorm/driver/sqlite/SqliteConnectionOptions';
+import { AuthModule } from '../modules/auth.module';
+import { Auth } from '../entity/auth.entity';
+import { UsersModule } from '../modules/users.module';
+import { User, UsersGroup, UserPermission, RefPermissions } from '../entity/user.entity';
+import { ArticlesModule } from '../modules/articles.module';
+import { Articles } from '../entity/articles.entity';
+
+const config: SqliteConnectionOptions = {
+   type: "sqlite",
+   database: "db/db.sqlite3",
+   entities: [Auth,User,UsersGroup,UserPermission,RefPermissions,Articles],
+   synchronize: true
+}
 
 @Module({
   imports: [
-    JwtModule.register({
-      secret: jwtConstants.secret,
-      signOptions: {expiresIn: jwtConstants.tokenExpire}
-    }),
+   TypeOrmModule.forRoot(config),
     CacheModule.register({
-      ttl: 10,
-      max: 10,
       isGlobal: true
     }),
-    PassportModule,
     AuthModule,
+    UsersModule,
+    ArticlesModule
   ],
   controllers: [AppController],
-  providers: [
-    JwtStrategy,
-  ],
+  providers: [JwtStrategy],
 })
 
 export class AppModule  implements NestModule {

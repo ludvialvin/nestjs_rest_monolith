@@ -1,27 +1,21 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
-import { ApiProperty } from '@nestjs/swagger';
+import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
-@Entity('user')
+@Entity()
 export class User {
-    @ApiProperty({ 
-        example: 1, 
-        description: 'user ID' 
-    })
-    @PrimaryGeneratedColumn()
-    id: number;
-  
-    @ApiProperty({
-      example: 1,
-      description: 'User Group ID',
-    })
-    @Column()
-    users_group_id: number;
-
-    @Column()
-    name: string;
-
-    @Column()
-    password: string;
+   @PrimaryGeneratedColumn()
+   id: number;
+   @Column()
+   name: string;
+   @Column()
+   email: string;
+   @Column()
+   password: string;
+   @Column({ type: "int", default: 2 })
+   user_group_id: number;
+   @Column({ type: "int", default: 0 })
+   is_active: number;
+   @Column({ type: "int", default: 0 })
+   is_deleted: number;
 }
 
 @Entity('user_group')
@@ -47,16 +41,22 @@ export class UserPermission {
     @PrimaryGeneratedColumn()
     id: number; 
 
-    @Column()
+    @Column({default: null})
     user_group_id: number; 
 
-    @Column()
+    @Column({default: null})
+    ref_permission_id: number; 
+
+    @Column({default: null})
     path: string;
 
-    @Column()
+    @Column({default: null})
     action: string;
 
-    @Column()
+    @Column({default: null})
+    full_path: string;
+
+    @Column({default: 0})
     is_active: number; 
 
     @Column({ type: 'datetime', default: null })
@@ -64,4 +64,22 @@ export class UserPermission {
 
     @Column({ type: 'datetime', default: null })
     modified_date: string; 
+}
+
+@Entity('ref_permissions')
+export class RefPermissions {
+    @PrimaryGeneratedColumn()
+    id: number; 
+
+    @Column()
+    name: string;
+
+    @Column({ type: 'datetime', default: null })
+    created_date: string;
+
+    @Column({ type: 'datetime', default: null })
+    modified_date: string; 
+
+    @Column({ default: '0' })
+    is_deleted: number; 
 }

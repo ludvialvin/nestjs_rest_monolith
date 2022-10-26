@@ -20,24 +20,6 @@ export class Auth {
     @Column({ type: 'datetime', default: null })
     modified_date: string; 
 
-    @Column({ default: false })
-    is_deleted: boolean;
-}
-
-@Entity('ref_permissions')
-export class RefPermissions {
-    @PrimaryGeneratedColumn()
-    id: number; 
-
-    @Column()
-    name: string;
-
-    @Column({ type: 'datetime', default: null })
-    created_date: string;
-
-    @Column({ type: 'datetime', default: null })
-    modified_date: string; 
-
-    @Column({ default: '0' })
-    is_deleted: number; 
+    @Column({ default: 0 })
+    is_deleted: number;
 }
